@@ -59,7 +59,7 @@ async def ingesta(TV: float, radio: float, newpaper: float, sales: float):
 
 
 
-# Endpoint to retrain the model
+# Endpoint para reentrenar
 @app.get("/retrain/")
 async def retrain():
    
@@ -72,7 +72,7 @@ async def retrain():
     results = cursor.fetchall()
     cursor.close()
 
-    # Separate features (X) and target (y)
+    # Separar en X e y
     X = np.array([list(row[:-1]) for row in results])  # Features
     y = np.array([row[-1] for row in results])        # Target
 
