@@ -20,15 +20,9 @@ app = FastAPI()
 
 import pickle
 
-# Load the model
 with open('data/advertising_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-# Print the type of the model
-print(type(model))
-
-# Print the model's attributes and methods
-print(dir(model))
 
 # 1. Endpoint de predicción
 @app.get("/predict/")
