@@ -1,42 +1,32 @@
 from fastapi import FastAPI, HTTPException
-import numpy as np
 import uvicorn
 import os
 import pickle
 import pandas as pd
 import sqlite3
+import numpy as np
 
-# Leer el archivo CSV
-df = pd.read_csv('data/advertising.csv')
+df = pd.read_csv('data/Advertising.csv')
 
-df.drop(columns='Unnamed: 0',axis=1,inplace=True)
-print(df.dtypes)
+app = FastAPI()
 
 # Crear una conexión a una base de datos SQLite en disco
 conn = sqlite3.connect('advertising.db')  # Asegúrate de que la extensión es .db
 df.to_sql('advertising', conn, if_exists='replace', index=False)
 
-app = FastAPI()
 
-import pickle
-
-with open('data/advertising_model.pkl', 'rb') as f:
-    model = pickle.load(f)
 
 
 # 1. Endpoint de predicción
-@app.get("/predict/")
-async def predict(tv: float, radio: float, newspaper: float):
-    
-    with open('data/advertising_model.pkl', 'rb') as f:
-        model = pickle.load(f)
+@app.get("/predict")
+async def prediccion(TV: int, radio: int, newpaper: int):
    
-    
-    input_data = np.array([[tv, radio, newspaper]])
-    predictions = model.predict(input_data)
-
-    
-    return predictions
+   with open('data/advertising_model.pkl', 'rb') as f:
+            model = pickle.load(f)
+   data_inversion = {'TV': TV, 'radio': radio, 'newpaper': newpaper}
+   input = pd.DataFrame([data_inversion])
+   prediction = model.predict(input)
+   return {"Prediction": prediction[0]}
 
 # 2. Endpoint de ingesta de datos
 
@@ -82,5 +72,4 @@ async def retrain():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
-   
 
